@@ -2,6 +2,7 @@ package com.recordario.compartido;
 
 import java.util.Arrays;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.Cookie;
@@ -12,13 +13,15 @@ import jakarta.servlet.http.HttpServletResponse;
 public class Utilidades {
     
     public void agregarCookie(HttpServletResponse respuesta, String nombre, String valor, int maxAge){
-        Cookie cookie = new Cookie(nombre, valor);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        cookie.setSecure(false);
-        
-        respuesta.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(nombre, valor)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(maxAge)
+            .sameSite("None")
+            .build();
+
+        respuesta.addHeader("Set-Cookie", cookie.toString());
     }
     
     public String obtenerCookie(HttpServletRequest request, String nombre) {
