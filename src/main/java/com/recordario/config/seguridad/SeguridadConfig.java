@@ -51,8 +51,8 @@ public class SeguridadConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("https://recordario.vercel.app/"));
-        configuration.setAllowedMethods(List.of("POST", "GET", "PUT", " DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedOrigins(List.of("https://recordario.vercel.app"));
+        configuration.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
