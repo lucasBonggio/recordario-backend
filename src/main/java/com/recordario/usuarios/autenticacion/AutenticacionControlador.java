@@ -45,7 +45,7 @@ public class AutenticacionControlador {
         return ResponseEntity.ok(usuario);
     }
 
-    @PostMapping("/contraseña/cambiar")
+    @PostMapping("/contraseña")
     public ResponseEntity<String> actualizarContrasena(@RequestBody CambiarContrasena datos, @AuthenticationPrincipal UserDetails userDetails){
         String nombreUsuario = userDetails.getUsername();
 

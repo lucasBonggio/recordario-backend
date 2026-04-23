@@ -70,14 +70,15 @@ public class UsuarioServicio {
 
         return mapearDTO(usuario);
     }
-
-    private UsuarioDTO mapearDTO(Usuario usuario){
-        return new UsuarioDTO(usuario.getId(), usuario.getNombreUsuario(), usuario.getEmail(), "Datos obtenidos correctamente.");
-    }
+    
     public ProgresoDTO obtenerProgreso(String nombreUsuario){
         Usuario usuario = obtenerUsuario(nombreUsuario);
 
         return construirRespuesta(usuario);
+    }
+    
+    private UsuarioDTO mapearDTO(Usuario usuario){
+        return new UsuarioDTO(usuario.getId(), usuario.getNombreUsuario(), usuario.getEmail(), "Datos obtenidos correctamente.");
     }
 
     private ProgresoDTO construirRespuesta(Usuario usuario) {

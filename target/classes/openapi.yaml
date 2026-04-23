@@ -1,0 +1,641 @@
+openapi: 3.1.0
+info:
+  title: Recordario API
+  description: | 
+    Esta API gestiona el estudio o repaso de los usuarios.
+  version: 1.0.0
+paths:
+  /publico/usuarios/registro:
+    post:
+      summary: Registra un nuevo usuario.
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrearUsuarioDTO"
+      responses:
+        '201':
+            description: Usuario registrado correctamente.
+            content:
+              application/json:
+                schema:
+                  type: string
+                  example: "Usuario registrado correctamente."
+        '400':
+          description: Nombre de usuario repetido.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NombreUsuarioRepetido"
+  /publico/usuarios/refrescar:
+    post:
+      summary: Refresca token JWT.
+      description: Genera un nuevo token y lo almacena en cookies. Requiere autenticacion(token en cookie)
+      tags:
+        - Autenticacion
+      responses:
+        '200':
+          description: Token refrescado correctamente.
+          headers:
+            Set-cookie:
+              schema:
+                type: String
+                example: "tokenAcceso=eyJHBgC....; Path=/; HttpOnly= Secure"
+              description: Token JWT en cookie HttpOnly
+        '401':
+          description: No autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsuarioNoAutenticado"
+  /publico/usuarios/login:
+    post:   
+      summary: Logea a un usuario.
+      tags: 
+        - Logeo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+      responses:
+        '200':
+          description: Usuario logeado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RespuestaInicioSesion"
+        '401':
+          description: Credenciales incorrectas.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredencialesIncorrectas"
+
+  /autenticacion/usuario/logout:
+    post:
+      summary: Finaliza la sesión del usuario.
+      tags:
+        - Logout
+      responses:
+        '200':
+          description: Sesión finalizada correctamente.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Sesión finalizada correctamente."
+  /autenticacion/usuario/me:
+    get:
+      summary: Obtienes información del usuario.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Informacion del usuario
+      responses:
+        '200':
+          description: Se obtuvo la información correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsuarioDTO"
+        '401':
+          description: No autenticado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsuarioNoAutenticado"
+        '404':
+          description: Usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecursoNoEncontrado"
+  /autenticacion/usuario/contraseña:
+    post:
+      summary: Cambia la contraseña del usuario.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Actualizacion de contraseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CambiarContraseña"
+      responses:
+        '200':
+          description: Contraseña actualizada correctamente.
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Contraseña actualizada correctamente."
+        '401':
+          description: Credenciales incorrectas.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredencialesIncorrectas"
+  /autenticacion/usuario/progreso:
+    get:
+      summary: Obtienes el progreso del usuario.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Progreso
+      responses:
+        '200':
+          description: Progreso obtenido correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgresoDTO"
+
+  /autenticacion/repaso/iniciar:
+    post:
+      summary: Iniciar una sesión de repaso.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Iniciar la sesion de repaso.
+      responses:
+        '200':
+          description: Sesion iniciada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SesionDTO"
+        '404':
+          description: No se encontró al usuario.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecursoNoEncontrado"
+  /autenticacion/repaso/sesion/responder:
+    post:
+      summary: Response una tarjeta.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Responder tarjeta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+              example: 1
+      responses:
+        '200':
+          description: Tarjeta respondida correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RespuestaTarjetaDTO"
+        '400':
+          description: Calificación fuera de rango.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatosInvalidos"
+  /autenticacion/repaso/sesion/finalizar:
+    post:
+      summary: Finaliza la sesión de repaso.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Finalizar sesión
+      responses:
+        '200':
+          description: Sesión finalizada correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MensajeRespuestaDTO"
+        '404':
+          description: No se encontró la sesión.
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RecursoNoEncontrado"
+  /autenticacion/repaso/sesion/tarjeta:
+    get:
+      summary: Obtiene la tarjeta actual.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Obtener tarjeta actual
+      responses:
+        '200':
+          description: Tarjeta devuelta correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TarjetaDTO"
+        '404':
+          description: No se encontró la tarjeta.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecursoNoEncontrado"
+        '409':
+          description: La sesión de repaso no existe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SesionFinalizada"
+
+  /autenticacion/libros/analizar:
+    post:
+      summary: Analiza apuntes.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Analizar notas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Libro"
+      responses:
+        '200':
+          description: Libro analizado correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalisisRespuestaDTO"
+  
+  /autenticacion/tarjetas/obtener:
+    get:
+      summary: Obtiene las tarjetas repasables.
+      description: Requiere autenticacion(token en cookie)
+      tags:
+        - Obtener tarjetas.
+      responses:
+        '200':
+          description: Tarjetas devueltas correctamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TarjetaDTO"
+components:
+  schemas:
+    CrearUsuarioDTO:
+      type: object
+      required:
+        - nombreUsuario
+        - contrasena
+        - email
+      properties:
+        nombreUsuario:
+          type: string
+          example: "CharlesTuxedo"
+        contrasena:
+          type: string
+          format: password
+          example: "contraseñaSegura123"
+        email:
+          type: string
+          format: email
+          example: "charles@gmail.com"
+    LoginDTO:
+      type: object
+      required:
+        - nombreUsuario
+        - contrasena
+      properties:
+        nombreUsuario:
+          type: string
+          example: "CharlesTuxedo"
+        contrasena:
+          type: string
+          format: password
+          example: "contraseñaSegura123"
+    RespuestaInicioSesion:
+      type: object
+      required:
+        - nombreUsuario
+        - mensaje
+      properties:
+        nombreUsuario: 
+          type: string
+          example: "CharlesTuxedo"
+        mensaje:
+          type: string
+          example: "Sesión iniciada correctamente."
+    UsuarioDTO:
+      type: object
+      required:
+        - usuarioId
+        - nombreUsuario
+        - email
+        - mensaje
+      properties:
+        usuarioId:
+          type: long
+          example: 1
+        nombreUsuario:
+          type: string
+          example: "CharlesTuxedo"
+        email:
+          type: string
+          format: email
+          example: "charles@gmail.com"
+        mensaje:
+          type: string
+          example: "Usuario encontrado correctamente."
+    CambiarContraseña:
+      type: object
+      required:
+        - contrasenaActual
+        - nuevaContrasena
+      properties:
+        contrasenaActual:
+          type: string
+          format: password
+          example: "contraseñaSegura123"
+        nuevaContraseña:
+          type: string
+          format: password
+          example: "nuevaContraseñaSegura123"
+    ProgresoDTO:
+      type: object
+      required:
+        - tarjetasTotales
+        - tarjetasPendientes
+        - tarjetasRepasadasHoy
+      properties:
+        tarjetasTotales:
+          type: integer
+          example: 2
+        tarjetasPendientes:
+          type: integer
+          example: 1
+        tarjetasRepasadasHoy:
+          type: integer
+          example: 1
+    SesionInicioDTO:
+      type: object
+      required:
+        - hayTarjetas
+        - mensaje
+        - sesionId
+        - tarjeta
+      properties:
+        hayTarjetas:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Sesion iniciada correctamente."
+        sesionId:
+          type: string 
+        tarjeta:
+          $ref: "#/components/schemas/TarjetaDTO"
+    RespuestaTarjetaDTO:
+      type: object
+      required:
+        - feedBack
+        - estadoSesion
+        - tarjeta
+        - mensaje
+      properties:
+        feedBack:
+          $ref: "#/components/schemas/FeedBack"
+        estadoSesion:
+          $ref: "#/components/schemas/EstadoSesionDTO"
+        tarjeta:
+          $ref: "#/components/schemas/TarjetaDTO"
+        mensaje:
+          type: string
+          example: "No se encontraron mas tarjetas. Sesión finalizada."
+    MensajeRespuestaDTO:
+      type: object
+      required:
+        - mensaje
+      properties:
+        mensaje:
+          type: string
+          example: "Sesión finalizada correctamente."
+    TarjetaDTO:
+      type: object
+      required:
+        - tarjetaId
+        - cartaId
+        - tipoCarta
+        - pregunta
+        - textoCarta
+        - textoCapitulo
+        - diasHastaProximaRevision
+      properties:
+        tarjetaId:
+          type: long
+          example: 1
+        cartaId:
+          type: long
+          example: 1
+        tipoPregunta:
+          type: string
+          enum: [ATMOSFERA, OSCURIDAD, REFLEXION, EMOCIONAL, TEMATICA, EXPLICATIVA]
+          example: 'EXPLICATIVA'
+        pregunta:
+          type: string
+          example: "Explicame este punto"
+        textoCarta:
+          type: string
+          example:  "Los gatos duermen 15 horas diarias."
+        textoCapitulo:
+          type: string
+          example: "El sueño de los gatos"
+        diasHastaProximaRevision:
+          type: integer
+          example: 1
+    Libro:
+      type: object
+      required:
+        - id
+        - titulo
+        - estado
+        - capitulos
+      properties:
+        id:
+          type: long
+          example: 1
+        titulo:
+          type: string
+          example: "La alimentación gatuna"
+        estado: 
+          type: string
+          enum: [LEYENDO, COMPLETO, PAUSADO, NUEVO, REVISADO, OBSOLETO]
+          example: 'LEYENDO'
+        capitulos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Capitulo'
+    AnalisisRespuestaDTO:
+      type: object
+      required:
+        - tarjetasCreadas
+      properties:
+        tarjetasCreadas:
+          type: integer
+          example: 1
+    Capitulo:
+      type: object
+      required:
+        - id
+        - titulo
+        - notas
+      properties:
+        id:
+          type: long
+          example: 1
+        titulo:
+          type: string
+          example: "Como alimentar bien a los gatos"
+        notas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notas'
+    Notas:
+      type: object
+      required:
+        - id
+        - texto
+      properties:
+        id:
+          type: long
+          example: 1
+        texto: 
+          type: string
+          example: "La alimentación gatuna depende de varios conceptos."
+    FeedBack:
+      type: object
+      required:
+        - tarjetaRespondidaId
+        - calificacion
+        - fueCorrecta
+      properties:
+        tarjetaRespondidaId:
+          type: long
+          example: 1
+        calificacion: 
+          type: integer
+          example: 1
+        fueCorrecta:
+          type: boolean
+          example: false
+    EstadoSesionDTO:
+      type: object
+      required:
+        - sesionFinalizada
+        - indiceActual
+        - totalTarjetas
+      properties:
+        sesionFinalizada:
+          type: boolean
+          example: false
+        indicaActual:
+          type: long
+          example: 2
+        totalTarjetas:
+          type: integer
+          example: 4
+
+    NombreUsuarioRepetido:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: "El nombre de usuario ya está en uso."
+        marcaTiempo:
+          type: string
+          format: date-time
+          example: "2025-04-20T10:30:00Z"
+        codigo:
+          type: integer
+          example: 400
+        estado:
+          type: string
+          example: "Bad Request"
+    CredencialesIncorrectas:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: "Credenciales incorrectas."
+        marcaTiempo:
+          type: string
+          format: date-time
+          example: "2025-04-20T10:30:00Z"
+        codigo:
+          type: integer
+          example: 401
+        estado:
+          type: string
+          example: "Unauthorized"
+    RecursoNoEncontrado:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: "Usuario no encontrado."
+        marcaTiempo:
+          type: string
+          format: date-time
+          example: "2025-04-20T10:30:00Z"
+        codigo:
+          type: integer
+          example: 404
+        estado:
+          type: string
+          example: "Not found"
+    SesionFinalizada:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: "Sesión inexistente o ya finalizada."
+        marcaTiempo:
+          type: string
+          format: date-time
+          example: "2025-04-20T10:30:00Z"
+        codigo:
+          type: integer
+          example: 409
+        estado:
+          type: string
+          example: "Conflict"
+    UsuarioNoAutenticado:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: "Token inválido o intexistente."
+        marcaTiempo:
+          type: string
+          format: date-time
+          example: "2025-04-20T10:30:00Z"
+        codigo:
+          type: integer
+          example: 401
+        estado:
+          type: string
+          example: "Unauthorized"
+    DatosInvalidos:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: "Respuesta inválida. Intentelo nuevamente."
+        marcaTiempo:
+          type: string
+          format: date-time
+          example: "2025-04-20T10:30:00Z"
+        codigo:
+          type: integer
+          example: 400
+        estado:
+          type: string
+          example: "Bad Request"

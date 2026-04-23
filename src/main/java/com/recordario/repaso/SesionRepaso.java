@@ -2,6 +2,7 @@ package com.recordario.repaso;
 
 import java.util.List;
 
+import com.recordario.excepciones.tipos.RecursoNoEncontrado;
 import com.recordario.excepciones.tipos.SesionFinalizada;
 import com.recordario.repaso.dto.ResultadoSesion;
 import com.recordario.tarjetas.Tarjeta;
@@ -48,7 +49,7 @@ public class SesionRepaso {
             throw new SesionFinalizada("La sesión está finalizada.");
         }
         if (tarjetas == null || tarjetas.isEmpty()) {
-            throw new IllegalStateException("La sesión no tiene tarjetas.");
+            throw new RecursoNoEncontrado("La sesión no tiene tarjetas.");
         }
     }
 

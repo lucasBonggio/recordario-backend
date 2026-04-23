@@ -77,7 +77,6 @@ public class SesionRepasoServicio {
     public RespuestaTarjetaDTO responderTarjeta(String sesionId, int calificacion) {
         SesionRepaso sesion = gestorSesiones.obtenerSesion(sesionId);
 
-        System.out.println("INDICE ANTES DE RESPONDER: " + sesion.getIndiceActual());
         Tarjeta tarjetaActual = sesion.tarjetaActual();
         
         TarjetaRespuesta resultado = tarjetaServicio.responderTarjeta(
