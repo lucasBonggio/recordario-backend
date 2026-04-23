@@ -41,7 +41,6 @@ Recordario te permite crear tarjetas de estudio organizadas en libros. El sistem
 - **Mockito** para mocks
 - **MockMvc** para tests de controladores
 - **H2 Database** para tests de integración
-- **TestContainers** (ready para escalar tests)
 
 ### DevOps
 - **Docker** para contenerización
@@ -159,12 +158,6 @@ mvn test
 mvn test -Dtest=*Service,*Controller
 ```
 
-### Ver cobertura
-```bash
-mvn jacoco:report
-# Reportes en: target/site/jacoco/index.html
-```
-
 **Cobertura actual:**
 - Servicios: ~100%
 - Controladores: ~100%
@@ -181,37 +174,35 @@ http://localhost:8080/swagger-ui.html
 ```
 
 ### Endpoints Principales
-
+#### Publicos 
+````
+POST   /api/v1/publico/usuario/register       - Crear cuenta
+POST   /api/v1/publico/usuario/login          - Iniciar sesión
+````
 #### Autenticación
 ```
-POST   /api/auth/register       - Crear cuenta
-POST   /api/auth/login          - Iniciar sesión
-POST   /api/auth/refresh        - Renovar token
-POST   /api/auth/logout         - Cerrar sesión
+POST   /api/v1/autenticacion/usuario/refresh        - Renovar token
+POST   /api/v1/autenticacion/usuario/logout         - Cerrar sesión
+POST   /api/v1/autenticacion/usuario/contraseña     - Actualizar contraseña
+GET    /api/v1/autenticacion/usuario/me             - Obtener información del usuario
+GET   /api/v1/autenticacion/usuario/progreso        - Obtener el progreso del usuario. 
 ```
 
-#### Libros
+#### Analisis
 ```
-POST   /api/libros              - Crear libro
-GET    /api/libros              - Listar mis libros
-GET    /api/libros/{id}         - Obtener detalles
-PUT    /api/libros/{id}         - Actualizar
-DELETE /api/libros/{id}         - Eliminar
+POST     /api/v1/autenticacion/libros/analizar      - Analizar notas
 ```
 
 #### Tarjetas
 ```
-POST   /api/libros/{libId}/tarjetas           - Crear tarjeta
-GET    /api/libros/{libId}/tarjetas           - Listar tarjetas
-PUT    /api/tarjetas/{id}                     - Actualizar
-DELETE /api/tarjetas/{id}                     - Eliminar
+GET    /api/v1/autenticacion/tarjetas/obtener      - Listar tarjetas
 ```
 
 #### Repasos (Estudiar)
 ```
-POST   /api/repasos/iniciar     - Comenzar sesión de estudio
-POST   /api/repasos/{id}/responder - Responder tarjeta (1-5)
-GET    /api/repasos/{id}        - Ver progreso actual
+POST   /api/v1/autenticacion/repaso/iniciar        - Comenzar sesión de estudio
+POST   /api/v1/autenticacion/repaso/sesion/responder      - Responder tarjeta (1-5)
+GET    /api/v1/autenticacion/repaso/sesion/finalizar        - Finalizar sesión de estudio
 ```
 
 **Todas las respuestas incluyen validación y manejo de errores global.**
@@ -239,6 +230,8 @@ recordario-backend/
 │   │   ├── enums/
 │   │   └── utilidades/
 │   ├── config/
+│   │   ├──seguridad/
+│   │   │   ├──JwtAthenticationEntryPoint.java
 │   │   ├── CorsConfig.java
 │   │   ├── JwtFilter.java
 │   │   └── SecurityConfig.java
