@@ -16,7 +16,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.recordario.compartido.enums.TipoCarta;
+import java.util.List;
+
 import com.recordario.excepciones.ManejarExcepcion;
 import com.recordario.excepciones.tipos.DatosInvalidos;
 import com.recordario.excepciones.tipos.RecursoNoEncontrado;
@@ -38,12 +39,14 @@ public class SesionRepasoControladorTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private final String ideas = "POO. Listas. ";
+
     @MockBean
     private SesionRepasoServicio sesionServicio;
 
     @Test
     void iniciarSesion_devuelve200() throws Exception {
-        TarjetaDTO tarjetaDTO = new TarjetaDTO(1L, 1L, TipoCarta.EMOCIONAL, "pregunta", "texto", "cap1",2);
+        TarjetaDTO tarjetaDTO = new TarjetaDTO(1L, "Explica este concepto","Programacion", ideas, 2);
 
         SesionInicioDTO dto = new SesionInicioDTO();
         dto.setHayTarjetas(true);
@@ -101,7 +104,7 @@ public class SesionRepasoControladorTest {
         RespuestaTarjetaDTO respuesta = new RespuestaTarjetaDTO();
         respuesta.setEstadoSesion(new EstadoSesionDTO(false, 1,2));
         respuesta.setFeedBack(new FeedBack(1L, 5, true));
-        respuesta.setTarjeta(new TarjetaDTO(2L, 1L, TipoCarta.EMOCIONAL, "Pregunta","textoCarta", "cap1", 5));
+        respuesta.setTarjeta(new TarjetaDTO(2L,"Explica este concepto", "Programacion", ideas, 4));
         respuesta.setMensaje("Tarjetas correctamente devueltas.");
 
         when(sesionServicio.responderTarjeta("sesion123", 5))

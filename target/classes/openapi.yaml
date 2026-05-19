@@ -244,26 +244,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/SesionFinalizada"
 
-  /autenticacion/libros/analizar:
+  /autenticacion/tarjetas/:
     post:
-      summary: Analiza apuntes.
+      summary: Genera tarjeta de repaso.
       description: Requiere autenticacion(token en cookie)
       tags:
-        - Analizar notas
+        - Genera tarjeta de repaso.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Libro"
+              $ref: "#/components/schemas/Tema"
       responses:
         '200':
-          description: Libro analizado correctamente.
+          description: Tarjeta creada satisfactoriamente.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalisisRespuestaDTO"
-  
+                type: string
+                example: "Tarjeta creada satisfactoriamente."
   /autenticacion/tarjetas/obtener:
     get:
       summary: Obtiene las tarjetas repasables.
@@ -422,42 +422,29 @@ components:
       type: object
       required:
         - tarjetaId
-        - cartaId
-        - tipoCarta
         - pregunta
-        - textoCarta
-        - textoCapitulo
+        - tituloTema
+        - puntosPrincipales
         - diasHastaProximaRevision
       properties:
         tarjetaId:
           type: long
           example: 1
-        cartaId:
-          type: long
-          example: 1
-        tipoPregunta:
-          type: string
-          enum: [ATMOSFERA, OSCURIDAD, REFLEXION, EMOCIONAL, TEMATICA, EXPLICATIVA]
-          example: 'EXPLICATIVA'
         pregunta:
           type: string
           example: "Explicame este punto"
-        textoCarta:
+        puntosPrincipales:
           type: string
-          example:  "Los gatos duermen 15 horas diarias."
-        textoCapitulo:
-          type: string
-          example: "El sueño de los gatos"
+          example:  "Sueño. Tipos de alimentacion"
         diasHastaProximaRevision:
           type: integer
           example: 1
-    Libro:
+    Tema:
       type: object
       required:
         - id
         - titulo
-        - estado
-        - capitulos
+        - ideasPrincipales
       properties:
         id:
           type: long
@@ -465,14 +452,10 @@ components:
         titulo:
           type: string
           example: "La alimentación gatuna"
-        estado: 
-          type: string
-          enum: [LEYENDO, COMPLETO, PAUSADO, NUEVO, REVISADO, OBSOLETO]
-          example: 'LEYENDO'
-        capitulos:
+        ideasPrincipales:
           type: array
           items:
-            $ref: '#/components/schemas/Capitulo'
+            type: string
     AnalisisRespuestaDTO:
       type: object
       required:
@@ -481,35 +464,6 @@ components:
         tarjetasCreadas:
           type: integer
           example: 1
-    Capitulo:
-      type: object
-      required:
-        - id
-        - titulo
-        - notas
-      properties:
-        id:
-          type: long
-          example: 1
-        titulo:
-          type: string
-          example: "Como alimentar bien a los gatos"
-        notas:
-          type: array
-          items:
-            $ref: '#/components/schemas/Notas'
-    Notas:
-      type: object
-      required:
-        - id
-        - texto
-      properties:
-        id:
-          type: long
-          example: 1
-        texto: 
-          type: string
-          example: "La alimentación gatuna depende de varios conceptos."
     FeedBack:
       type: object
       required:

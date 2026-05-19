@@ -1,6 +1,7 @@
 package com.recordario;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +35,7 @@ import com.recordario.usuarios.Usuario;
 import com.recordario.usuarios.UsuarioServicio;
 
 @ExtendWith(MockitoExtension.class)
-public class TestSesionRepasoServicio {
+public class SesionRepasoServicioTest {
 
     @InjectMocks
     private SesionRepasoServicio sesionServicio;
@@ -182,17 +183,14 @@ public class TestSesionRepasoServicio {
         assertEquals("La sesión está finalizada.", excepcion.getMessage());
     }
 
-
     @Test
     void iniciarSesion_usuarioSinTarjetas(){
         Usuario usuario = new Usuario();
         usuario.setNombreUsuario("usuarioTest");
+        usuario.setTarjetas(new ArrayList<>());
         
         when(usuarioServicio.obtenerUsuario("usuarioTest"))
             .thenReturn(usuario);
-
-        when(sesionServicio.ordenarTarjetaPorPrioridad(List.of(), ordenarPrioridad))
-            .thenReturn(List.of());
 
         when(gestorSesion.crearSesion(any()))   
             .thenReturn("sesionCreada-123");

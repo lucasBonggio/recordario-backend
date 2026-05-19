@@ -1,6 +1,7 @@
 package com.recordario;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,11 +23,13 @@ import com.recordario.tarjetas.Tarjeta;
 import com.recordario.tarjetas.TarjetaRepositorio;
 import com.recordario.tarjetas.TarjetaServicio;
 import com.recordario.tarjetas.dto.TarjetaRespuesta;
+import com.recordario.tema.PuntosImportantesServicio;
+import com.recordario.tema.Tema;
+import com.recordario.tema.TemaServicio;
 import com.recordario.usuarios.UsuarioServicio;
 
-@Tag("tarjeta_testeos_servicio")
 @ExtendWith(MockitoExtension.class)
-public class TarjetaServicioTests {
+public class TarjetaServicioTest {
 
     @InjectMocks
     private TarjetaServicio tarjetaServicio;
@@ -37,10 +40,29 @@ public class TarjetaServicioTests {
     @Mock
     private UsuarioServicio usuarioServicio;
 
+    @Mock
+    private TemaServicio temaServicio;
+
+    @Mock PuntosImportantesServicio puntosServicio;
+
     @BeforeEach
     void setUp(){
         tarjetaServicio = new TarjetaServicio(tarjetaRepositorio, 
             new Sm2Servicio(), usuarioServicio);
+        temaServicio = new TemaServicio(tarjetaServicio, puntosServicio);
+    }
+
+    @Test
+    void crearTarjeta_exitosamente(){
+        Tema nuevoTema = new Tema();
+        nuevoTema.setTitulo("Programación");
+        List<String> ideas = List.of("POO", "SOLID");
+        nuevoTema.setIdeasPrincipales(ideas);
+
+        String respuesta = temaServicio.crearTarjeta(nuevoTema, "nombreUsuario");
+
+        assertNotNull(respuesta);
+        assertEquals("Tarjeta creada satisfactoriamente.", respuesta);
     }
 
     @Test
@@ -111,7 +133,6 @@ public class TarjetaServicioTests {
         assertTrue(tarjeta.getProximaRevision().isAfter(LocalDate.now()));
     }
 
-    @Tag("no_existe_la_tarjeta_y_lanza_excepcion")
     @Test
     void responderTarjeta_tarjetaInexistente_lanzaExcepcion(){
         when(tarjetaRepositorio.findById(1l))

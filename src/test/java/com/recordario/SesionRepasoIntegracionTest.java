@@ -33,7 +33,7 @@ import jakarta.transaction.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class SesionRepasoTestIntegracion {
+public class SesionRepasoIntegracionTest {
     @Autowired
     private SesionRepasoServicio sesionRepasoServicio;
 

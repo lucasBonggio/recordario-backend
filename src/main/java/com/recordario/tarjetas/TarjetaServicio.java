@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.recordario.cartas.Carta;
 import com.recordario.excepciones.tipos.RecursoNoEncontrado;
 import com.recordario.repaso.sm2.Sm2Servicio;
 import com.recordario.tarjetas.dto.DatosTarjeta;
@@ -61,21 +62,21 @@ public class TarjetaServicio {
         return TarjetaRespuesta.mapearRespuesta(tarjeta, calificacion);
     }
     
-    public Tarjeta armarTarjeta(DatosTarjeta datos){
+    private Tarjeta armarTarjeta(DatosTarjeta datos){
         Usuario usuario = usuarioServicio.obtenerUsuario(datos.nombreUsuario());
 
         Tarjeta tarjeta = new Tarjeta();
         tarjeta.setUsuario(usuario);
         tarjeta.setCarta(datos.carta());
-        tarjeta.setPregunta(datos.pregunta());
+        tarjeta.setTituloTema(datos.carta().getTituloTema());
+        asignarConsigna(tarjeta, datos.carta().getPuntosPrincipales());
+        tarjeta.setPuntosPrincipales(datos.carta().getPuntosPrincipales());
         tarjeta.setIntervalo(0);
         tarjeta.setRepeticiones(0);
         tarjeta.setFactorFacilidad(2.5);
         tarjeta.setUltimaRevision(null);
         tarjeta.setProximaRevision(LocalDate.now());
-        tarjeta.setTextoCarta(datos.carta().getDescripcion());
-        tarjeta.setTituloCapitulo(datos.tituloCapitulo());
-
+        
         return tarjeta;
     }
 
@@ -91,7 +92,20 @@ public class TarjetaServicio {
                                 .toList();
     }
 
+    public void asignarConsigna(Tarjeta tarjeta, String puntos){
+        if(esCartaAuxiliar(puntos)) tarjeta.setConsigna("¿Cómo explicarías este concepto con tus propias palabras?"); 
+        tarjeta.setConsigna("Desarrollá este concepto con tus propias palabras y mencioná las ideas clave.");
+    }
+
     public boolean esRapasable(Tarjeta tarjeta){
         return tarjeta.getProximaRevision().isBefore(LocalDate.now()) || tarjeta.getProximaRevision().equals(LocalDate.now());
+    }
+
+    public void completarPuntosImportantes(Tarjeta tarjeta, Carta carta){
+        if(esCartaAuxiliar(carta.getPuntosPrincipales()));
+    }
+
+    public boolean esCartaAuxiliar(String puntos){
+        return puntos == null;
     }
 }

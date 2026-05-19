@@ -32,14 +32,14 @@ public class Tarjeta {
     @JoinColumn(name="usuario_id")
     @JsonBackReference("usuario-tarjetas")
     private Usuario usuario;
-    private String pregunta;
+    private String consigna;
+    private String tituloTema;
     private int repeticiones;
     private int intervalo;
     private double factorFacilidad;
     private LocalDate proximaRevision;
     private LocalDate ultimaRevision;
-    private String tituloCapitulo;
-    private String textoCarta;
+    private String puntosPrincipales;
     
 
     @ManyToOne(cascade=CascadeType.PERSIST)
@@ -74,11 +74,9 @@ public class Tarjeta {
 
     public TarjetaDTO aDTO(){
         return new TarjetaDTO(this.getId(), 
-                            this.getCarta().getId(),
-                            this.getCarta().getTipoCarta(),
-                            this.pregunta,
-                            this.textoCarta,
-                            this.tituloCapitulo,
+                            this.consigna,
+                            this.tituloTema,
+                            this.puntosPrincipales,
                             this.getIntervalo());
     }
 

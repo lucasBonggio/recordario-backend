@@ -1,8 +1,10 @@
 package com.recordario;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import com.recordario.analisis.modelos.Capitulo;
-import com.recordario.cartas.Carta;
-import com.recordario.libro.Libro;
+import com.recordario.tema.Tema;
 import com.recordario.usuarios.Usuario;
 import com.recordario.usuarios.UsuarioRepositorio;
 import com.recordario.usuarios.dto.CrearUsuarioDTO;
@@ -62,16 +62,20 @@ class FlujoCompletoIntegracionTest {
         
         Long usuarioId = usuario.get().getId();
 
-        Libro libro = libroDePrueba();
+        Tema tema = temaDePrueba();
 
-        mockMvc.perform(
-                post("/api/v1/autenticacion/libros/analizar")
+        MvcResult resultado = mockMvc.perform(
+                post("/api/v1/autenticacion/tarjetas/")
                     .with(user("usuarioTest"))
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(libro))
+                    .content(objectMapper.writeValueAsString(tema))
         )
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.tarjetasCreadas").value(greaterThan(0)));
+        .andReturn();
+
+        String mensaje = resultado.getResponse().getContentAsString();
+
+        assertEquals("Tarjeta creada satisfactoriamente.", mensaje);
 
         assertTrue(
             usuarioRepositorio.countTarjetasTotales(usuarioId) > 0
@@ -112,19 +116,13 @@ class FlujoCompletoIntegracionTest {
         .andExpect(jsonPath("$.tarjetasRepasadasHoy").value(1));
     }
 
-    private Libro libroDePrueba() {
-        Libro libro = new Libro();
-        libro.setTitulo("Clean Code");
+    private Tema temaDePrueba(){
+        List<String> ideasPrincipales = List.of("POO", "Java");
+        Tema prueba = new Tema();
 
-        Capitulo capitulo = new Capitulo();
-        capitulo.setTitulo("Capítulo 1");
-
-        Carta carta = new Carta();
-        carta.setDescripcion("Los nombres de variables deben ser descriptivos");
-
-        capitulo.getCartas().add(carta);
-        libro.getCapitulos().add(capitulo);
-
-        return libro;
+        prueba.setTitulo("Programación");
+        prueba.setIdeasPrincipales(ideasPrincipales);
+        return prueba;
+        
     }
 }

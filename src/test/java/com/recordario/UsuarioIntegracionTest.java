@@ -29,7 +29,7 @@ import jakarta.transaction.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class UsuarioTestIntegracion {
+public class UsuarioIntegracionTest {
     @Autowired
     private UsuarioServicio usuarioServicio;
 
@@ -140,7 +140,7 @@ public class UsuarioTestIntegracion {
         tarjeta3.setUsuario(usuario);
         tarjetaRepositorio.save(tarjeta3);
 
-        ProgresoDTO progreso = usuarioServicio.obtenerProgreso("usuarioTest");
+        ProgresoDTO progreso = usuarioServicio.obtenerProgreso("nombreUsuario");
 
         assertNotNull(progreso);
 

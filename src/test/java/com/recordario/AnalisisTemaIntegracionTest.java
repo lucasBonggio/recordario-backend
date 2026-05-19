@@ -2,7 +2,7 @@ package com.recordario;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +12,14 @@ import org.springframework.http.MediaType;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recordario.analisis.modelos.Capitulo;
-import com.recordario.cartas.Carta;
-import com.recordario.libro.Libro;
 import com.recordario.tarjetas.Tarjeta;
 import com.recordario.tarjetas.TarjetaRepositorio;
+import com.recordario.tema.Tema;
 import com.recordario.usuarios.Usuario;
 import com.recordario.usuarios.UsuarioRepositorio;
 
@@ -31,7 +29,7 @@ import jakarta.transaction.Transactional;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-class AnalisisLibroIntegracionTest {
+class AnalisisTemaIntegracionTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,40 +44,37 @@ class AnalisisLibroIntegracionTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void analizarLibro_creaTarjetas_yPermiteIniciarSesionDeRepaso() throws Exception {
+    void analizarTema_creaTarjetas_yPermiteIniciarSesionDeRepaso() throws Exception {
         Usuario usuario = new Usuario();
         usuario.setNombreUsuario("usuarioTest");
         usuarioRepositorio.save(usuario);
 
-        Libro libro = libroDePrueba();
+        Tema tema = temaDePrueba();
 
-        mockMvc.perform(
-                post("/api/v1/autenticacion/libros/analizar")
+        MvcResult resultado = mockMvc.perform(
+                post("/api/v1/autenticacion/tarjetas/")
                 .with(user("usuarioTest"))
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(libro))
+                    .content(objectMapper.writeValueAsString(tema))
             )
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.tarjetasCreadas").value(greaterThan(0)));
+            .andReturn();
+
+        String mensaje = resultado.getResponse().getContentAsString();
+
+        assertEquals("Tarjeta creada satisfactoriamente.", mensaje);
 
         List<Tarjeta> tarjetas = tarjetaRepositorio.findAllByUsuario(usuario);
         assertFalse(tarjetas.isEmpty());
     }
 
+    private Tema temaDePrueba(){
+        List<String> ideasPrincipales = List.of("POO", "Java");
+        Tema prueba = new Tema();
 
-    private Libro libroDePrueba() {
-        Libro libro = new Libro();
-        libro.setTitulo("Clean Code");
-
-        Capitulo capitulo = new Capitulo();
-        capitulo.setTitulo("Capítulo 1");
-
-        Carta carta = new Carta();
-        carta.setDescripcion("Los nombres de variables deben ser descriptivos");
-
-        capitulo.getCartas().add(carta);
-        libro.getCapitulos().add(capitulo);
-
-        return libro;
+        prueba.setTitulo("Programación");
+        prueba.setIdeasPrincipales(ideasPrincipales);
+        return prueba;
+        
     }
 }
