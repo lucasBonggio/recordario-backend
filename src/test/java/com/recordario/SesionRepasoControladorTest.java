@@ -16,8 +16,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import com.recordario.excepciones.ManejarExcepcion;
 import com.recordario.excepciones.tipos.DatosInvalidos;
 import com.recordario.excepciones.tipos.RecursoNoEncontrado;
